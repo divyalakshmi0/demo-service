@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${companyName} + ' - Invoice'">AppLogics - Invoice</title>
+    <style>
+        @page { size: A4; margin: 0; }
+        body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; width: 280mm; }
+        .invoice { background: #fff; font-size: 12px; position: relative; width: 100%; margin: 0; padding: 25mm; box-sizing: border-box; }
+        .header { width: 100%; overflow: hidden; margin-bottom: 20px; }
+        .header .company { float: left; width: 60%; }
+        .header .right { float: right; width: 35%; text-align: right; }
+        .header .company .name { font-size: 20px; font-weight: 600; margin-bottom: 8px; color: #2c3e50; }
+        .header .company .address { font-size: 12px; color: #555; font-weight: 400; line-height: 18px; width: 300px; }
+        .header .right .title { font-size: 32px; font-weight: 600; margin-bottom: 10px; color: #2c3e50; }
+        .header .right .meta { font-size: 11px; color: #666; line-height: 1.4; }
+        .header .right .meta div { margin-bottom: 4px; }
+        .header .right .meta strong { color: #333; }
+        .clearfix:after { content: ""; display: table; clear: both; }
+        .line1, .line2, .line3 { border-top: 1px solid #ddd; margin: 25px 0; clear: both; }
+        .client-section { width: 100%; overflow: hidden; margin-bottom: 20px; }
+        .client-left { float: left; width: 48%; line-height: 1.4; }
+        .client-right { float: right; width: 48%; line-height: 1.4; }
+        .section-title { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #2c3e50; text-transform: uppercase; letter-spacing: 0.5px; }
+        .client-left .company-name { font-weight: 600; margin-bottom: 8px; font-size: 13px; color: #333; }
+        .client-left p, .client-right p { margin: 4px 0; font-size: 11px; color: #555; }
+        .payment-info { background: #f8f9fa; padding: 15px; border-radius: 4px; border-left: 3px solid #3498db; }
+        .payment-table { width: 100%; font-size: 10px; }
+        .payment-table td:first-child { font-weight: 600; color: #666; padding-right: 8px; width: 40%; }
+        .payment-table td:last-child { color: #333; }
+        .payment-table tr { margin-bottom: 3px; }
+        .project-info { background: #f8f9fa; padding: 15px; border-radius: 4px; margin: 20px 0; overflow: hidden; }
+        .project-info .info-item { float: left; width: 18%; margin-right: 2%; text-align: center; margin-bottom: 10px; }
+        .project-info .info-item:last-child { margin-right: 0; }
+        .info-label { font-size: 10px; color: #666; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .info-value { font-size: 11px; color: #333; font-weight: 500; }
+        .invoice-table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 20px 0; }
+        .invoice-table thead { background: #e6f8fa; }
+        .invoice-table th { padding: 12px 8px; text-align: center; font-size: 11px; font-weight: 600; color: #333; border: 1px solid #ddd; }
+        .invoice-table tbody td { padding: 10px 8px; border: 1px solid #ddd; text-align: center; font-size: 11px; color: #333; }
+        .invoice-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
+        .invoice-table th:last-child, .invoice-table td:last-child { text-align: right; font-weight: 600; }
+        .employee-name { text-align: left !important; font-weight: 600; color: #2c3e50; }
+        .amount-cell { color: #27ae60; font-weight: 600; }
+        .total-container { text-align: right; margin: 20px 0; }
+        .total-box { background-color: #27ae60; color: white; padding: 12px 30px 12px 20px; border-radius: 40px 0 0 40px; display: inline-block; font-size: 12px; margin-right: -40px; }
+        .total-box .label { font-weight: normal; font-size: 12px; margin-right: 15px; }
+        .total-box .amount { font-weight: 700; font-size: 20px; }
+        .footer-container { border: 1px solid #ddd; border-radius: 6px; margin-top: 20px; padding: 20px; font-size: 11px; line-height: 1.5; color: #555; }
+        .footer-container p { margin-bottom: 10px; }
+        .footer-container strong { color: #e74c3c; }
+        .page-info { text-align: center; margin-top: 15px; color: #777; font-size: 10px; font-style: italic; }
+        .bottom-bar { border-top: 1px solid #ddd; font-size: 10px; color: #666; margin-top: 25px; padding-top: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+<div class="invoice">
+    <div class="header clearfix">
+        <div class="company">
+            <img th:src="'data:image/png;base64,' + ${logoBase64}"
+                 alt="Company Logo" style="height:50px; margin-bottom:8px;" />
+            <div class="name" th:text="${companyName}">AppLogics</div>
+            <div class="address">
+                <div th:text="${companyAddress}">15000 Weston Parkway Cary, NC 27513</div>
+                <div th:text="'Phone: ' + ${companyPhoneNo}">Phone: (910)309-3804</div>
+<!--                <div>Fax: 973 292 4743</div>-->
+                <div th:text="'URL: ' + ${companyUrl}">URL: www.app-logics.com/</div>
+            </div>
+        </div>
+        <div class="right">
+            <div class="title">INVOICE</div>
+            <div class="meta">
+                <div><strong>Invoice #:</strong> <span id="invoice-number">INV-2025-001</span></div>
+                <div><strong>Date:</strong> <span th:text="${#dates.format(today, 'MMMM dd, yyyy')}"></span>
+                </div>
+<!--                <div><strong>Due Date:</strong> <span id="due-date">October 07, 2025</span></div>-->
+            </div>
+        </div>
+    </div>
+
+    <div class="line1"></div>
+
+    <div class="client-section clearfix">
+        <div class="client-left">
+            <div class="section-title">— Bill To</div>
+            <div class="company-name">RELX Inc. (SOW)</div>
+            <p>1801 Varsity Dr</p>
+            <p>Raleigh, NC 27606</p>
+        </div>
+        <div class="client-right">
+            <div class="section-title">— Payment Information</div>
+            <div class="payment-info">
+                <table class="payment-table">
+                    <tr><td>Attention:</td><td>Accounts Receivable</td></tr>
+                    <tr><td>Company:</td><td th:text="${companyName} + ' (fka Collabera Inc)'">AppLogics</td></tr>
+                    <tr><td>Address:</td><td>15000 Weston Parkway<br>Cary, NC 27513</td></tr>
+                    <tr><td>Payment Type:</td><td><strong>ACH Payment</strong></td></tr>
+                    <tr><td>Bank Name:</td><td th:text="${bankName}">Bank of America</td></tr>
+                    <tr><td>Account Type:</td><td th:text="${bankAccountType}">Checking</td></tr>
+                    <tr><td>Account #:</td><td th:text="${bankAccount}">009417739995</td></tr>
+                    <tr><td>Routing #:</td><td>021200339</td></tr>
+                    <tr><td>Remit Email:</td><td th:text="${remitEmail}">applogics@gmail.com</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="line2"></div>
+
+    <div class="project-info clearfix">
+        <div class="info-item"><div class="info-label">Client Info</div><div class="info-value">T000001-011</div></div>
+        <div class="info-item"><div class="info-label">Work Order</div><div class="info-value">15</div></div>
+        <div class="info-item"><div class="info-label">PO Number</div><div class="info-value">T000001011PR BI</div></div>
+        <div class="info-item"><div class="info-label">Terms</div><div class="info-value">Net 45</div></div>
+        <div class="info-item"><div class="info-label">Period</div><div class="info-value">07/01/2025 - 07/31/2025</div></div>
+    </div>
+
+    <table class="invoice-table">
+        <thead>
+        <tr>
+            <th style="width: 120px;">Employee</th>
+            <th style="width: 80px;">Week End</th>
+            <th style="width: 70px;">ST Rate (Hourly)</th>
+            <th style="width: 70px;">ST Units (Hours)</th>
+            <th style="width: 70px;">OT Rate (Hourly)</th>
+            <th style="width: 70px;">OT Units</th>
+            <th style="width: 80px;">Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="employeeEntry : ${invoice}">
+            <tr th:each="invoiceRecord, rowStat : ${employeeEntry.value}">
+                <td class="employee-name" th:text="${rowStat.first ? employeeEntry.key : ''}">Ankit Gupta</td>
+                <td th:text="${invoiceRecord.weekEnd}">5/7/25</td>
+                <td th:text="${invoiceRecord.stRate}">$49.00</td>
+                <td th:text="${invoiceRecord.stUnits}">32</td>
+                <td th:text="${invoiceRecord.otRate != null and invoiceRecord.otRate != '' and invoiceRecord.otRate != '-' ? invoiceRecord.otRate : '-'}">-</td>
+                <td th:text="${invoiceRecord.otUnits != null and invoiceRecord.otUnits != '' and invoiceRecord.otUnits != '-' ? invoiceRecord.otUnits : '-'}">-</td>
+                <td class="amount-cell" th:text="${invoiceRecord.amount}">$1,568.00</td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+
+    <div class="line3"></div>
+
+    <div class="total-container">
+        <div class="total-box">
+            <span class="label">Invoice Total (USD):</span>
+            <span class="amount" th:text="${totalAmount}">$27,048.00</span>
+        </div>
+    </div>
+
+    <div class="footer-container">
+        <p><strong th:text="${companyName}">Ascendion Inc</strong> certifies that this invoice is correct, that payment has not been received and that it is presented with the understanding that the amount to be paid thereunder can be audited to verify.</p>
+        <p>All invoices are to be paid within payment term. In case of overdue balances <strong>0.5% monthly late fee</strong> will be added to all overdue balances until paid.</p>
+        <div class="page-info">Page 1 of 1</div>
+    </div>
+
+    <div class="bottom-bar">Professional invoice generated for US client services</div>
+</div>
+</body>
+</html>
