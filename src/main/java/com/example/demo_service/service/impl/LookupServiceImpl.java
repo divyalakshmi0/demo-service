@@ -94,10 +94,15 @@ public class LookupServiceImpl implements LookupService {
 
         if (file.exists()) {
             workbook = new XSSFWorkbook(new FileInputStream(file));
-            sheet = workbook.getSheetAt(0);
         } else {
             workbook = new XSSFWorkbook();
-            sheet = workbook.createSheet("Timesheet");
+        }
+
+        String sheetName = entry.getEmployeeId();
+        sheet = workbook.getSheet(sheetName);
+
+        if (sheet == null) {
+            sheet = workbook.createSheet(sheetName);
             createHeaderRow(sheet);
         }
 
@@ -117,8 +122,9 @@ public class LookupServiceImpl implements LookupService {
         }
         workbook.close();
 
-        log.info("LookupServiceImpl :: saveTimesheetEntry() :: Success - row={}", rowNum);
+        log.info("LookupServiceImpl :: saveTimesheetEntry() :: Success - employeeSheet={} row={}", sheetName, rowNum);
     }
+
 
     @Override
     public File getTimesheetFile() {
